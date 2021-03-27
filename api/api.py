@@ -29,3 +29,8 @@ async def create_report(report: Report):
 
     await publish(app.extra['broker_connection'], str(uuid), departure, critical)
     return ReportCreated(created_datetime=report.date, uuid=uuid)
+
+
+@app.get('/user/{user}')
+async def get_user(user: str):
+    return user
