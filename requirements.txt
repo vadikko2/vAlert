@@ -2,4 +2,3 @@ aio-pika
 fastapi
 uvicorn
 pydantic
-aioconsole

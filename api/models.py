@@ -12,6 +12,16 @@ class ReportCreated(BaseModel):
 
 
 class Reporter(BaseModel):
+    id: UUID
+    first_name: str
+    last_name: str
+    position: str = None
+    address: str
+    email: str
+
+
+class Resolver(BaseModel):
+    id: UUID
     first_name: str
     last_name: str
     position: str = None
@@ -27,6 +37,7 @@ class Report(BaseModel):
     reporter: Reporter
     departure: str
     critical: str
+    resolver: Resolver = None
 
     @validator('departure')
     def validate_departure_name(cls, v):
