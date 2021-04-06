@@ -50,3 +50,9 @@ class Report(BaseModel):
         if not (v in CRITICAL_TYPES):
             raise ValueError('Неизвестная степень критичности')
         return v
+
+
+class ReportAssigned(BaseModel):
+    id: UUID
+    # report: Report # todo раскоментировать когда будем получать заявки из базы
+    date: datetime = Field(default_factory=datetime.now)

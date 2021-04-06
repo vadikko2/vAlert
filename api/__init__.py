@@ -1,10 +1,14 @@
 import asyncio
+from asyncio import get_event_loop
+
 from aio_pika import Connection
 from fastapi import FastAPI
 
 from broker.utils import get_broker_connection
 from broker.deploy import deploy_infra
 from api import reports, users
+from collector.daemon import collector
+from broker.callbacks import collector_callback
 
 app = FastAPI()
 
@@ -22,15 +26,6 @@ async def deploy_broker_infra():
     Информацию для развертывания берет в constants.py (названия департаментов и приоритеты)
     """
     await deploy_infra(app.extra['broker_connection'])
-
-
-@app.on_event('startup')
-async def run_collector_daemon():
-    """
-    Поднимает демона c коллектором, который будует постоянно слушать очереди с приоритетами
-    и складывать заявки в одну очередь (reports)
-    """
-    pass
 
 
 @app.on_event('shutdown')

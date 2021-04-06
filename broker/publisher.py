@@ -3,7 +3,7 @@ import aio_pika
 from constants import CRITICAL_TYPES, DEPARTURES
 
 
-async def publish(connection: aio_pika.Connection, message: str, departure: str, critical_type: str):
+async def publish_report(connection: aio_pika.Connection, message: str, departure: str, critical_type: str):
     async with connection.channel() as channel:
 
         departure = departure.lower().strip()
