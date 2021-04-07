@@ -1,4 +1,9 @@
 aio-pika
 fastapi
+python-multipart
 uvicorn
 pydantic
+alembic==1.4.2
+sqlalchemy
+sqlalchemy-utils
+dynaconf[yaml]==3.1.4

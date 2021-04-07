@@ -6,11 +6,6 @@ from uuid import UUID, uuid4
 from constants import DEPARTURES, CRITICAL_TYPES
 
 
-class ReportCreated(BaseModel):
-    uuid: UUID
-    created_datetime: datetime
-
-
 class Reporter(BaseModel):
     id: UUID
     first_name: str
@@ -56,3 +51,10 @@ class ReportAssigned(BaseModel):
     id: UUID
     # report: Report # todo раскоментировать когда будем получать заявки из базы
     date: datetime = Field(default_factory=datetime.now)
+    resolver_uuid: UUID
+
+
+class ReportCreated(BaseModel):
+    uuid: UUID
+    created_datetime: datetime
+    creator_uuid: UUID

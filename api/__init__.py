@@ -1,12 +1,12 @@
 import asyncio
-from asyncio import get_event_loop
 
 from aio_pika import Connection
 from fastapi import FastAPI
 
 from broker.utils import get_broker_connection
 from broker.deploy import deploy_infra
-from api import reports, users
+from api.reports import query as reports
+from api.users import query as users
 
 app = FastAPI()
 

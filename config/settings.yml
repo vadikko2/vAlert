@@ -1,0 +1,11 @@
+default:
+  NAME: vAlert
+  HOST: 0.0.0.0
+  PORT: 8000
+  POSTGRES:
+    host: postgres
+    port: 5432
+    user: postgres
+    password: postgres
+    database: vAlert
+
