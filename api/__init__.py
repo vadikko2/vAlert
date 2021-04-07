@@ -7,8 +7,6 @@ from fastapi import FastAPI
 from broker.utils import get_broker_connection
 from broker.deploy import deploy_infra
 from api import reports, users
-from collector.daemon import collector
-from broker.callbacks import collector_callback
 
 app = FastAPI()
 

@@ -6,3 +6,5 @@ services:
     ports:
       - 5672:5672
       - 15672:15672
+    environment:
+      - RABBITMQ_VM_MEMORY_HIGH_WATERMARK=0.9

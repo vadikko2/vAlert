@@ -15,7 +15,10 @@ router = APIRouter(
 
 
 @router.post('/create', response_model=ReportCreated)
-async def create_report(report: Report, request: Request):
+async def create_report(report: Report, request: Request, user_uuid: Optional[UUID] = Cookie(None)):
+    if not user_uuid:
+        raise HTTPException(status_code=401,
+                             detail="Отсутствует UUID пользователя в запросе. Заявка не может быть создана.")
     uuid = report.id
     departure = report.departure
     critical = report.critical
@@ -26,21 +29,22 @@ async def create_report(report: Report, request: Request):
 @router.get('/get', response_model=ReportAssigned)  # todo должен возвращать Report
 async def get_report(request: Request, user_uuid: Optional[UUID] = Cookie(None)):
     if not user_uuid:
-        return False
-    else:
-        connection = request.app.extra['broker_connection']  # type: Connection
-        async with connection.channel() as channel:
-            message = await listen_one_from_queue(
-                channel=channel,
-                queue_name=COLLECTOR_QUEUE_NAME
-            )  # type: Optional[IncomingMessage]
+        raise HTTPException(status_code=401,
+                             detail="Отсутствует UUID пользователя в запросе. Заявка не может быть назначена.")
 
-            if message is None:
-                raise HTTPException(status_code=404, detail="Нет заявок доступных для выполнения")
-            else:
-                response = ReportAssigned(id=message.body.decode('utf-8'))
+    connection = request.app.extra['broker_connection']  # type: Connection
+    async with connection.channel() as channel:
+        message = await listen_one_from_queue(
+            channel=channel,
+            queue_name=COLLECTOR_QUEUE_NAME
+        )  # type: Optional[IncomingMessage]
 
-            # todo тут должен быть в БД по UUID и должен формироваться объект Report
-            # todo тут должен быть запрос в БД, который проставляет resolver для заявки
+        if message is None:
+            raise HTTPException(status_code=404, detail="Нет заявок доступных для выполнения")
+        else:
+            response = ReportAssigned(id=message.body.decode('utf-8'))
 
-            return response
+        # todo тут должен быть в БД по UUID и должен формироваться объект Report
+        # todo тут должен быть запрос в БД, который проставляет resolver для заявки
+
+        return response

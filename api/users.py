@@ -7,7 +7,7 @@ router = APIRouter(
 )
 
 
-@router.get('/{user}')
+@router.get('/user/{user}')
 async def get_user(user: str):
     return user
 
