@@ -8,3 +8,12 @@ services:
       - 15672:15672
     environment:
       - RABBITMQ_VM_MEMORY_HIGH_WATERMARK=0.4
+
+  database:
+    image: "postgres"
+    env_file:
+      - database.env
+    volumes:
+      - data:/var/lib/postgresql/data/
+volumes:
+  data:

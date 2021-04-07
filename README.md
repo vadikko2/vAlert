@@ -5,7 +5,7 @@
 Чтобы развернуть проект необходимо выполнить следующие действия:
 
 1. Установить все необходимые зависимости `pip3 install -r requirements.txt`
-2. Развернуть `rabbitmq`(можно в `docker`: `docker-compose up`)
+2. Развернуть инфраструктуру: `rabbitmq`, `postgresql` (можно в `docker`: `docker-compose up`).
 3. Запустить сервис vAlert `python3 main.py`
 4. Запустить коллектор `python3 run_collector.py`
 
