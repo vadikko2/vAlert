@@ -3,9 +3,9 @@ from typing import Optional
 from aio_pika import Connection, IncomingMessage
 from fastapi import APIRouter, Request, HTTPException, Depends
 
-from api.users.utils import secure_mode
+from vAlert.users.utils import secure_mode
 from constants import COLLECTOR_QUEUE_NAME
-from api.reports.models import ReportCreated, Report, ReportAssigned
+from vAlert.reports.models import ReportCreated, Report, ReportAssigned
 from broker.publisher import publish_report
 from broker.consumer import listen_one_from_queue
 

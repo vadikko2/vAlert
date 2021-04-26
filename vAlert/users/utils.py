@@ -1,12 +1,12 @@
 import secrets
 from typing import Optional
-from uuid import uuid4, UUID
+from uuid import UUID
 from hashlib import md5
 
 from fastapi import Depends, HTTPException, status, Cookie
 from fastapi.security import HTTPBasicCredentials, HTTPBasic
 
-from api.users.models import UserInDB
+from vAlert.users.models import UserInDB
 
 security = HTTPBasic()
 
