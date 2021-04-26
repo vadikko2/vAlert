@@ -6,7 +6,7 @@ from hashlib import md5
 from fastapi import Depends, HTTPException, status, Cookie
 from fastapi.security import HTTPBasicCredentials, HTTPBasic
 
-from vAlert.users.models import UserInDB
+from vAlert.api.users.models import UserInDB
 
 security = HTTPBasic()
 

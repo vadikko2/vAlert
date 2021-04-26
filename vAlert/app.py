@@ -11,8 +11,8 @@ from uvicorn import run
 from broker.deploy import deploy_infra
 from broker.utils import get_broker_connection
 from vAlert.config import VERSION, settings
-import vAlert.reports.query as reports
-import vAlert.users.query as users
+import vAlert.api.reports.query as reports
+import vAlert.api.users.query as users
 
 
 class Application:

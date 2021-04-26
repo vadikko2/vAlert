@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Response, Depends
 
-from vAlert.users.models import Login
-from vAlert.users.utils import auth
+from vAlert.api.users.models import Login
+from vAlert.api.users.utils import auth
 
 router = APIRouter(
     prefix='/users'
