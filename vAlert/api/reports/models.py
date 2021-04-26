@@ -28,7 +28,7 @@ class Report(BaseModel):
     id: UUID = Field(default_factory=uuid4)
     title: str
     description: str
-    date: datetime = Field(default_factory=datetime.now)
+    timestamp: datetime = Field(default_factory=datetime.now)
     reporter: Reporter
     departure: str
     critical: str

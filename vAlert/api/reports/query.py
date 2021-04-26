@@ -22,7 +22,7 @@ async def create_report(report: Report, request: Request, user_uuid=Depends(secu
     departure = report.departure
     critical = report.critical
     await publish_report(request.app.extra['broker_connection'], str(uuid), departure, critical)
-    return ReportCreated(created_datetime=report.date, uuid=uuid, creator_uuid=user_uuid)
+    return ReportCreated(created_datetime=report.timestamp, uuid=uuid, creator_uuid=user_uuid)
 
 
 @router.get('/get', response_model=ReportAssigned)  # todo должен возвращать Report
