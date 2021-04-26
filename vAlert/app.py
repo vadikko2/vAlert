@@ -63,16 +63,11 @@ class Application:
             await deploy_infra(self.app.extra['broker_connection'])
 
     def __enter__(self):
-        for event in self._on_startup:
-            event()
-
-        for route in self._routes:
-            self.app.include_router(route)
-
+        list(map(lambda event: event(), self._on_startup))
+        list(map(lambda route: route(), self._routes))
         self.run()
         logging.info(f'{self.app_name} запущен: v.{self.version}')
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        for event in self._on_shutdown:
-            event()
+        list(map(lambda event: event(), self._on_shutdown))
