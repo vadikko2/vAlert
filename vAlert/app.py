@@ -1,6 +1,8 @@
 import asyncio
 import logging
 import logging.config
+import os
+from concurrent.futures import ThreadPoolExecutor
 
 from aio_pika import Connection
 from fastapi import FastAPI
@@ -18,6 +20,7 @@ class Application:
         self.app = FastAPI()
         self._on_startup = [
             self._init_logging,
+            self._init_pool_thread,
             self._init_broker_connection,
             self._deploy_infra
 
@@ -36,6 +39,11 @@ class Application:
 
     def run(self):
         run(app=self.app, host=settings.HOST, port=settings.PORT)
+
+    def _init_pool_thread(self):
+        @self.app.on_event('startup')
+        async def init():
+            self.app.extra['pool_thread'] = ThreadPoolExecutor(max_workers=os.cpu_count())
 
     def _init_logging(self):
         @self.app.on_event('startup')
@@ -62,12 +70,18 @@ class Application:
             """
             await deploy_infra(self.app.extra['broker_connection'])
 
-    def __enter__(self):
+    def startup(self):
         list(map(lambda event: event(), self._on_startup))
         list(map(lambda route: route(), self._routes))
+
+    def shutdown(self):
+        list(map(lambda event: event(), self._on_shutdown))
+
+    def __enter__(self):
+        self.startup()
         self.run()
         logging.info(f'{self.app_name} запущен: v.{self.version}')
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        list(map(lambda event: event(), self._on_shutdown))
+        self.shutdown()
