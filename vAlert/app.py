@@ -13,6 +13,7 @@ from broker.utils import get_broker_connection
 from vAlert.config import VERSION, settings
 import vAlert.api.reports.query as reports
 import vAlert.api.users.query as users
+from vAlert.database.db import Database
 
 
 class Application:
@@ -22,11 +23,12 @@ class Application:
             self._init_logging,
             self._init_pool_thread,
             self._init_broker_connection,
-            self._deploy_infra
-
+            self._deploy_infra,
+            self._connect_database
         ]
         self._on_shutdown = [
-            self._close_broker_connection
+            self._close_broker_connection,
+            self._disconnect_database
         ]
 
         self._routes = [
@@ -70,9 +72,20 @@ class Application:
             """
             await deploy_infra(self.app.extra['broker_connection'])
 
+    def _connect_database(self):
+        @self.app.on_event("startup")
+        async def startup():
+            self.app.extra['database'] = Database()
+            await self.app.extra['database'].connect()
+
+    def _disconnect_database(self):
+        @self.app.on_event("shutdown")
+        async def shutdown():
+            await self.app.extra['database'].disconnect()
+
     def startup(self):
         list(map(lambda event: event(), self._on_startup))
-        list(map(lambda route: route(), self._routes))
+        list(map(lambda route: self.app.include_router(route), self._routes))
 
     def shutdown(self):
         list(map(lambda event: event(), self._on_shutdown))
