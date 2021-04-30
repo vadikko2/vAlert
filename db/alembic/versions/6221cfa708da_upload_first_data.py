@@ -6,8 +6,14 @@ Create Date: 2021-04-27 21:05:32.250697
 
 """
 from alembic import op
-import sqlalchemy as sa
+from json import load
 
+import sys
+
+from sqlalchemy import MetaData, Table
+
+sys.path.append('../')
+from vAlert.database.models import CriticalTypesModel
 
 # revision identifiers, used by Alembic.
 revision = '6221cfa708da'
@@ -17,7 +23,11 @@ depends_on = None
 
 
 def upgrade():
-    pass
+    meta = MetaData(bind=op.get_bind())
+    meta.reflect(only=(CriticalTypesModel.__tablename__,))
+    critical_types_table = Table(CriticalTypesModel.__tablename__, meta)
+
+    op.bulk_insert(critical_types_table, load(open('data/critical_types.json')))
 
 
 def downgrade():

@@ -1,0 +1,22 @@
+[
+  {
+    "name": "Критичная",
+    "frequency": 0.5,
+    "short_name": "critical"
+  },
+  {
+    "name": "Важная",
+    "frequency": 0.25,
+    "short_name": "important"
+  },
+  {
+    "name": "Обычная",
+    "frequency": 0.175,
+    "short_name": "normal"
+  },
+  {
+    "name": "Не критичная",
+    "frequency": 0.075,
+    "short_name": "low"
+  }
+]
