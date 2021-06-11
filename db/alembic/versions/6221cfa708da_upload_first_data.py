@@ -13,7 +13,7 @@ import sys
 from sqlalchemy import MetaData, Table
 
 sys.path.append('../')
-from vAlert.database.models import CriticalTypesModel
+from vAlert.database.models import CriticalTypesModel, RolesModel
 
 # revision identifiers, used by Alembic.
 revision = '6221cfa708da'
@@ -24,10 +24,15 @@ depends_on = None
 
 def upgrade():
     meta = MetaData(bind=op.get_bind())
-    meta.reflect(only=(CriticalTypesModel.__tablename__,))
-    critical_types_table = Table(CriticalTypesModel.__tablename__, meta)
+    meta.reflect(only=(CriticalTypesModel.__tablename__, RolesModel.__tablename__))
 
-    op.bulk_insert(critical_types_table, load(open('data/critical_types.json')))
+    critical_types_table = Table(CriticalTypesModel.__tablename__, meta)
+    roles_table = Table(RolesModel.__tablename__, meta)
+    critical_type_data = load(open('data/critical_types.json'))
+    roles_data = load(open('data/roles.json'))
+
+    op.bulk_insert(critical_types_table, critical_type_data)
+    op.bulk_insert(roles_table, [dict(name=item) for item in roles_data])
 
 
 def downgrade():

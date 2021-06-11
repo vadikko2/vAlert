@@ -1,38 +1,22 @@
 from pydantic import BaseModel, validator, Field
 
 from datetime import datetime
-from uuid import UUID, uuid4
+from uuid import UUID
 
 from constants import DEPARTURES, CRITICAL_TYPES
-
-
-class Reporter(BaseModel):
-    id: UUID
-    first_name: str
-    last_name: str
-    position: str = None
-    address: str
-    email: str
-
-
-class Resolver(BaseModel):
-    id: UUID
-    first_name: str
-    last_name: str
-    position: str = None
-    address: str
-    email: str
+from vAlert.api.info.model import CriticalType
+from vAlert.api.users.model import User
 
 
 class Report(BaseModel):
-    id: UUID = Field(default_factory=uuid4)
-    title: str
-    description: str
-    timestamp: datetime = Field(default_factory=datetime.now)
-    reporter: Reporter
-    departure: str
-    critical: str
-    resolver: Resolver = None
+    id: int = Field(..., title='Идентификатор заявки в базе данных')
+    title: str = Field(..., title='Название заявки')
+    description: str = Field(..., title='Описание проблемы')
+    timestamp: datetime = Field(default_factory=datetime.now, title='Веременная метка (default=datetime.now)')
+    reporter: User = Field(..., title='Идентификатор создателя заявки')
+    departure: str = Field(..., title='Отдел, в рамках которого возникла проблема.')
+    critical: CriticalType = Field(..., title='Степень критичности')
+    resolver: User = Field(..., )
 
     @validator('departure')
     def validate_departure_name(cls, v):

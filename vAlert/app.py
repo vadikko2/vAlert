@@ -13,6 +13,7 @@ from broker.utils import get_broker_connection
 from vAlert.config import VERSION, settings
 import vAlert.api.reports.query as reports
 import vAlert.api.users.query as users
+import vAlert.api.info.query as info
 from vAlert.database.db import Database
 
 
@@ -33,7 +34,8 @@ class Application:
 
         self._routes = [
             reports.router,
-            users.router
+            users.router,
+            info.router
         ]
 
         self.version = VERSION

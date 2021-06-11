@@ -1,12 +1,17 @@
-import secrets
+from datetime import timedelta, datetime
 from hashlib import md5
-from typing import Optional
 from uuid import UUID
+from jwt import PyJWTError
+import jwt
 
-from fastapi import Depends, HTTPException, status, Cookie
-from fastapi.security import HTTPBasicCredentials, HTTPBasic
+from fastapi import Depends, HTTPException
+from fastapi.security import HTTPBasic
+from starlette.status import HTTP_403_FORBIDDEN
 
-from vAlert.api.users.models import UserInDB
+from vAlert.api.auth.model import TokenData
+from vAlert.api.auth.utils import oauth2_scheme, verify_password
+from vAlert.api.users.model import UserInDB, User
+from vAlert.config import settings
 
 security = HTTPBasic()
 
@@ -30,39 +35,51 @@ fake_users_db = {
 }
 
 
-def get_user(db, username: str):  # todo db здесь должна быть сессия с БД
+def get_user(db, username: str) -> UserInDB:
     if username in db:
         user_dict = db[username]
         return UserInDB(**user_dict)
+
+
+async def get_current_user(token: str = Depends(oauth2_scheme), jwt=None):
+    credentials_exception = HTTPException(
+        status_code=HTTP_403_FORBIDDEN, detail="Could not validate credentials"
+    )
+    try:
+        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
+        username: str = payload.get("sub")
+        if username is None:
+            raise credentials_exception
+        token_data = TokenData(username=username)
+    except PyJWTError:
+        raise credentials_exception
+    user = get_user(fake_users_db, username=token_data.username)
+    if user is None:
+        raise credentials_exception
+    return user
+
+
+async def get_current_active_user(current_user: User = Depends(get_current_user)):
+    if current_user.disabled:
+        raise HTTPException(status_code=400, detail="Inactive user")
+    return current_user
+
+
+def authenticate_user(fake_db, username: str, password: str):
+    user = get_user(fake_db, username)
+    if not user:
+        return False
+    if not verify_password(password, user.password_hash):
+        return False
+    return user
+
+
+def create_access_token(*, data: dict, expires_delta: timedelta = None):
+    to_encode = data.copy()
+    if expires_delta:
+        expire = datetime.utcnow() + expires_delta
     else:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Failed login",
-            headers={"WWW-Authenticate": "Basic"},
-        )
-
-
-def auth(credentials: HTTPBasicCredentials = Depends(security)):
-    # todo тут надо слазить в базу и взять оттуда md5
-    # todo от полученного пароля надо взять md5 и сравить его с md5 из базы
-    user = get_user(fake_users_db, credentials.username)
-    correct_username = secrets.compare_digest(credentials.username, user.username)
-    correct_password = secrets.compare_digest(md5(credentials.password.encode('utf-8')).hexdigest(),
-                                              user.hashed_password)
-    if not (correct_username and correct_password):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect email or password",
-            headers={"WWW-Authenticate": "Basic"},
-        )
-    return user.user_uuid
-
-
-def secure_mode(user_uuid: Optional[UUID] = Cookie(None), auth_user_uuid=Depends(auth)):
-    if not auth_user_uuid == user_uuid:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="UUID from cookie and UUID from auth is not the same.",
-            headers={"WWW-Authenticate": "Basic"},
-        )
-    return user_uuid
+        expire = datetime.utcnow() + timedelta(minutes=15)
+    to_encode.update({"exp": expire})
+    encoded_jwt = jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
+    return encoded_jwt

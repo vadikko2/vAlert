@@ -2,6 +2,9 @@ default:
   NAME: vAlert
   HOST: 0.0.0.0
   PORT: 8000
+  ACCESS_TOKEN_EXPIRE_MINUTES: 30
+  ALGORITHM: HS256
+  SECRET_KEY: eb679221905e971c4ec984b3c9b03cde7c8f44960c2d089fd9ee3a6255e2f82e
 
   POSTGRES:
     host: postgres
@@ -9,7 +12,7 @@ default:
     user: postgres
     password: postgres
     database: valert
-    
+
   RABBIT:
     host: rabbitmq
     port: 5672

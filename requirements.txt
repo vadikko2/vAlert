@@ -3,10 +3,13 @@ fastapi
 python-multipart
 uvicorn
 pydantic
-alembic==1.4.2
+alembic
 sqlalchemy
 sqlalchemy-utils
-dynaconf[yaml]==2.2.3
+dynaconf[yaml]==3.1.4
 psycopg2-binary==2.8.6
 databases
 asyncpg
+pyjwt
+starlette==0.13.8
+passlib
